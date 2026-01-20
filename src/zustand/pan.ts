@@ -1,24 +1,24 @@
 import { create } from "zustand";
+import { Vector2 } from "~/lib/math";
 import type { Position } from "~/types/node";
 
 type PanningState = {
-  start: (x: number, y: number) => void;
+  start: (v: Vector2) => void;
   stop: () => void;
   isPanning: boolean;
-  startedAt: Position;
+  startedAt: Vector2;
 
-  offset: Position;
-  setOffset: (x: number, y: number) => void;
+  offset: Vector2;
+  setOffset: (v: Vector2) => void;
 };
 
 const usePanning = create<PanningState>(set => ({
-  start: (x, y) => set(s => ({ ...s, startedAt: { x, y }, isPanning: true })),
+  start: v => set(s => ({ ...s, startedAt: v, isPanning: true })),
   stop: () => set(s => ({ ...s, isPanning: false })),
   isPanning: false,
-  startedAt: { x: 0, y: 0 },
-
-  offset: { x: 0, y: 0 },
-  setOffset: (x, y) => set(s => ({ ...s, offset: { x, y } }))
+  startedAt: Vector2.ZERO,
+  offset: Vector2.ZERO,
+  setOffset: v => set(s => ({ ...s, offset: v }))
 }));
 
 export { usePanning };

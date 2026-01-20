@@ -3,6 +3,7 @@ import type React from "react";
 import { BASE_STATE_RADIUS } from "~/lib/consts";
 import { cn } from "~/lib/utils";
 import type { NodeLabel } from "~/types/node";
+import { LatexRenderer } from "./latex";
 
 type StateProps = {
   index: number;
@@ -21,7 +22,7 @@ const State: React.FC<StateProps> = ({
   ...props
 }) => {
   const [radius, setRadius] = useState<number>(BASE_STATE_RADIUS);
-  const [label, setLabel] = useState<NodeLabel>(index + 1);
+  const [label, setLabel] = useState<NodeLabel>(index);
   const [accepting, setAccepting] = useState<boolean>(false);
   const diameter = useMemo(() => radius * 2, [radius]);
 
@@ -52,15 +53,15 @@ const State: React.FC<StateProps> = ({
       )}
       onMouseDown={onMousedown}
     >
-      <p
+      <div
         className={cn(
           "text-center outline-none",
           "pointer-events-none",
           "select-none"
         )}
       >
-        {label}
-      </p>
+        <LatexRenderer latex={`q_{${label}}`} />
+      </div>
     </div>
   );
 };

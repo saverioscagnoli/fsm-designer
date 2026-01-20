@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Position } from "~/types/node";
+import { Vector2 } from "~/lib/math";
 
 type DragState = {
   start: (index: number) => void;
@@ -7,8 +7,8 @@ type DragState = {
   isDragging: boolean;
   node: number | null;
 
-  offset: Position;
-  setOffset: (x: number, y: number) => void;
+  offset: Vector2;
+  setOffset: (v: Vector2) => void;
 };
 
 const useDragging = create<DragState>()(set => ({
@@ -18,8 +18,8 @@ const useDragging = create<DragState>()(set => ({
 
   isDragging: false,
   node: null,
-  offset: { x: 0, y: 0 },
-  setOffset: (x, y) => set(s => ({ ...s, offset: { x, y } }))
+  offset: Vector2.ZERO,
+  setOffset: v => set(s => ({ ...s, offset: v }))
 }));
 
 export { useDragging };

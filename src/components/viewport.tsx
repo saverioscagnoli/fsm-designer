@@ -1,19 +1,25 @@
 import { useEvent } from "@util-hooks/use-event";
-import { useMemo, useState, type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
 import {
   BASE_STATE_RADIUS,
   MAX_ZOOM,
   MIN_ZOOM,
   ZOOM_INTENSITY
 } from "~/lib/consts";
-import type { Position } from "~/types/node";
 import { useDragging } from "~/zustand/drag";
 import { usePanning } from "~/zustand/pan";
 import { State } from "./state";
+import { Arrow } from "./arrow";
 import { cn, getWorldX, getWorldY, getWorldYTopbar } from "~/lib/utils";
+import { Vector2 } from "~/lib/math";
 
 const Viewport = () => {
-  const [nodes, setNodes] = useState<Position[]>([{ x: 100, y: 100 }]);
+  const [nodes, setNodes] = useState<Vector2[]>([
+    new Vector2(
+      window.innerWidth / 2 - BASE_STATE_RADIUS,
+      window.innerHeight / 2 - BASE_STATE_RADIUS
+    )
+  ]);
 
   const drag = useDragging();
   const pan = usePanning();
@@ -26,10 +32,12 @@ const Viewport = () => {
 
     let position = nodes[index];
 
-    let worldX = (e.clientX - pan.offset.x) / zoom;
-    let worldY = (e.clientY - pan.offset.y) / zoom;
+    let worldPos = new Vector2(
+      getWorldX(e.clientX, pan.offset.x, zoom) - position.x,
+      getWorldY(e.clientY, pan.offset.y, zoom) - position.y
+    );
 
-    drag.setOffset(worldX - position.x, worldY - position.y);
+    drag.setOffset(worldPos);
   };
 
   const onViewportMouseDown = (e: MouseEvent) => {
@@ -38,14 +46,19 @@ const Viewport = () => {
       let y =
         getWorldYTopbar(e.clientY, pan.offset.y, zoom) - BASE_STATE_RADIUS;
 
-      setNodes(p => [...p, { x, y }]);
+      setNodes(p => [...p, new Vector2(x, y)]);
 
       return;
     }
 
-    if (e.button != 1 || e.currentTarget !== e.target) return;
+    if (e.currentTarget !== e.target) return;
 
-    pan.start(e.clientX - pan.offset.x, e.clientY - pan.offset.y);
+    let panStartedAt = new Vector2(
+      e.clientX - pan.offset.x,
+      e.clientY - pan.offset.y
+    );
+
+    pan.start(panStartedAt);
   };
 
   useEvent(window, "mousemove", e => {
@@ -56,12 +69,17 @@ const Viewport = () => {
       setNodes(p =>
         p.map((node, i) =>
           i === drag.node
-            ? { ...node, x: worldX - drag.offset.x, y: worldY - drag.offset.y }
+            ? new Vector2(worldX - drag.offset.x, worldY - drag.offset.y)
             : node
         )
       );
     } else if (pan.isPanning) {
-      pan.setOffset(e.clientX - pan.startedAt.x, e.clientY - pan.startedAt.y);
+      let panOffset = new Vector2(
+        e.clientX - pan.startedAt.x,
+        e.clientY - pan.startedAt.y
+      );
+
+      pan.setOffset(panOffset);
     }
   });
 
@@ -83,15 +101,16 @@ const Viewport = () => {
 
     let newPanX = mX - worldX * newZoom;
     let newPanY = mY - worldY * newZoom;
+    let newPan = new Vector2(newPanX, newPanY);
 
     setZoom(newZoom);
-    pan.setOffset(newPanX, newPanY);
+    pan.setOffset(newPan);
   });
 
   return (
     <div
       className={cn(
-        "w-screen h-[calc(100vh-3rem)] relative overflow-hidden",
+        "w-screen h-full relative overflow-hidden",
         pan.isPanning && "cursor-grabbing"
       )}
       onMouseDown={onViewportMouseDown}
@@ -112,6 +131,25 @@ const Viewport = () => {
           transformOrigin: "0 0"
         }}
       >
+        {/* Render arrows connecting consecutive states */}
+        {nodes.map((node, i) => {
+          if (i < nodes.length - 1) {
+            const nextNode = nodes[i + 1];
+            return (
+              <Arrow
+                key={`arrow-${i}`}
+                x1={node.x}
+                y1={node.y}
+                x2={nextNode.x}
+                y2={nextNode.y}
+                radius={BASE_STATE_RADIUS}
+              />
+            );
+          }
+          return null;
+        })}
+
+        {/* Render states */}
         {nodes.map((p, i) => (
           <State key={i.toString()} index={i} x={p.x} y={p.y} onGrab={onGrab} />
         ))}

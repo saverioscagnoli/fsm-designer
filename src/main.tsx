@@ -3,6 +3,7 @@ import { App } from "~/App";
 import { ThemeContextProvider } from "~/context/theme";
 
 import "~/index.css";
+import "katex/dist/katex.min.css";
 
 createRoot(document.getElementById("root")!).render(
   <ThemeContextProvider>

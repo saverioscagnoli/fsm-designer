@@ -15,6 +15,7 @@
     "@util-hooks/use-event": "^2.0.0",
     "@util-hooks/use-hotkey": "^3.0.1",
     "clsx": "^2.1.1",
+    "katex": "^0.16.27",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.4.0",
