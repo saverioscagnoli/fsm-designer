@@ -1,67 +1,52 @@
-import { useMemo, useState, type ComponentProps, type MouseEvent } from "react";
 import type React from "react";
-import { BASE_STATE_RADIUS } from "~/lib/consts";
+import { useMemo, type MouseEvent } from "react";
 import { cn } from "~/lib/utils";
-import type { NodeLabel } from "~/types/node";
-import { LatexRenderer } from "./latex";
+import type { State as StateT } from "~/zustand/machine";
+import { LatexRenderer } from "~/components/latex-renderer";
 
-type StateProps = {
-  index: number;
-  x: number;
-  y: number;
-  onGrab?: (index: number, e: MouseEvent) => void;
-} & ComponentProps<"div">;
+type StateProps = StateT & {
+  id: string;
+  onGrab: (id: string, e: MouseEvent) => void;
+};
 
 const State: React.FC<StateProps> = ({
-  index,
-  x,
-  y,
-  onGrab,
-  className,
-  style,
-  ...props
+  id,
+  label,
+  latex,
+  radius,
+  position,
+  onGrab
 }) => {
-  const [radius, setRadius] = useState<number>(BASE_STATE_RADIUS);
-  const [label, setLabel] = useState<NodeLabel>(index);
-  const [accepting, setAccepting] = useState<boolean>(false);
   const diameter = useMemo(() => radius * 2, [radius]);
 
-  const onMousedown = (e: MouseEvent) => {
+  const onMouseDown = (e: MouseEvent) => {
     if (e.target == e.currentTarget && onGrab) {
-      onGrab(index, e);
+      onGrab(id, e);
     }
   };
 
   return (
     <div
-      {...props}
       style={{
         width: diameter,
         height: diameter,
-        top: y,
-        left: x,
-        ...style
+        top: position.y,
+        left: position.x
       }}
       className={cn(
         "absolute",
         "inline-flex items-center justify-center",
-        "rounded-full bg-(--slate-1)",
+        "rounded-full",
         "text-xl text-(--slate-12)",
-        "outline-3 outline-(--slate-12",
-        "active:cursor-grabbing",
-        className
+        "bg-(--slate-1)",
+        "border-3 border-(--slate-12)",
+        "active:cursor-grabbing"
       )}
-      onMouseDown={onMousedown}
+      onMouseDown={onMouseDown}
     >
-      <div
-        className={cn(
-          "text-center outline-none",
-          "pointer-events-none",
-          "select-none"
-        )}
-      >
-        <LatexRenderer latex={`q_{${label}}`} />
-      </div>
+      <span className={cn("text-center select-none pointer-events-none")}>
+        {latex ? <LatexRenderer latex={label} /> : label}
+      </span>
     </div>
   );
 };

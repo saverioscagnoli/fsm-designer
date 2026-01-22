@@ -2,7 +2,7 @@ import { cn } from "~/lib/utils";
 
 const Topbar = () => {
   return (
-    <div className={cn("w-full h-12", "border-b border-b-(--gray-6)")}></div>
+    <div className={cn("w-screen h-12", "border-b border-b-(--gray-6)")}> </div>
   );
 };
 

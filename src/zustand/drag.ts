@@ -1,25 +1,23 @@
-import { create } from "zustand";
 import { Vector2 } from "~/lib/math";
+import { createShallow } from "~/zustand/shallow";
 
 type DragState = {
-  start: (index: number) => void;
+  start: (id: string) => void;
   stop: () => void;
   isDragging: boolean;
-  node: number | null;
-
+  id: string | null;
   offset: Vector2;
   setOffset: (v: Vector2) => void;
 };
 
-const useDragging = create<DragState>()(set => ({
-  start: node => set(s => ({ ...s, node, isDragging: true })),
-
-  stop: () => set(s => ({ ...s, node: null, isDragging: false })),
-
+const useDragging = createShallow<DragState>(set => ({
+  start: id => set(s => ({ id, isDragging: true })),
+  stop: () => set(s => ({ id: null, isDragging: false })),
   isDragging: false,
-  node: null,
+  id: null,
   offset: Vector2.ZERO,
-  setOffset: v => set(s => ({ ...s, offset: v }))
+  setOffset: v => set(s => ({ offset: v }))
 }));
 
 export { useDragging };
+export type { DragState };

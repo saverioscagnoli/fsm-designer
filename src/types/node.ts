@@ -1,6 +1,7 @@
+import type { Vector2 } from "~/lib/math";
+
 type NodeID = string | number;
 type NodeLabel = string | number;
-type Position = { x: number; y: number };
-type NodeMap = Record<string | number, Position>;
+type NodeMap = Record<string | number, Vector2>;
 
-export type { NodeID, NodeLabel, Position, NodeMap };
+export type { NodeID, NodeLabel, NodeMap };
