@@ -29,7 +29,7 @@ const LatexRenderer: React.FC<LatexRendererProps> = ({
 
   useEffect(() => {
     if (!containerRef.current || !latex) return;
-    const blocks = latex
+    let blocks = latex
       .split(/\n\s*\n/)
       .map(b => b.trim())
       .filter(b => b);
@@ -37,10 +37,10 @@ const LatexRenderer: React.FC<LatexRendererProps> = ({
     containerRef.current.innerHTML = "";
 
     blocks.forEach(block => {
-      const el = document.createElement("div");
+      let el = document.createElement("div");
       containerRef.current!.appendChild(el);
 
-      const isMathBlock =
+      let isMathBlock =
         block.startsWith("\\[") ||
         block.startsWith("\\(") ||
         block.startsWith("\\begin") ||
@@ -48,7 +48,7 @@ const LatexRenderer: React.FC<LatexRendererProps> = ({
         block.includes("^") ||
         displayMode;
 
-      const cleanBlock = block.replace(/^\\\[|\\\]$/g, "");
+      let cleanBlock = block.replace(/^\\\[|\\\]$/g, "");
       renderBlock(cleanBlock, el, isMathBlock);
     });
   }, [latex, displayMode]);
