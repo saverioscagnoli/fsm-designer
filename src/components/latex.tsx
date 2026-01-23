@@ -16,15 +16,12 @@ const renderBlock = (
   }
 };
 
-type LatexRendererProps = {
+type LatexProps = {
   latex: string;
   displayMode?: boolean;
 };
 
-const LatexRenderer: React.FC<LatexRendererProps> = ({
-  latex,
-  displayMode = true
-}) => {
+const Latex: React.FC<LatexProps> = ({ latex, displayMode = true }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,5 +53,5 @@ const LatexRenderer: React.FC<LatexRendererProps> = ({
   return <div ref={containerRef} />;
 };
 
-export { LatexRenderer };
-export type { LatexRendererProps };
+export { Latex };
+export type { LatexProps };

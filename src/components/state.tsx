@@ -1,87 +1,56 @@
-import type React from "react";
-import { useMemo, useState, type MouseEvent } from "react";
 import { cn } from "~/lib/utils";
-import type { State as StateT } from "~/zustand/machine";
-import { LatexRenderer } from "~/components/latex-renderer";
-import type { ViewportState } from "~/zustand/viewport";
-import type { MachineState } from "~/zustand/machine";
-import { stateMouseLeave } from "~/events/state-mouse-leave";
+import { Latex } from "~/components/latex";
+import React, { useMemo } from "react";
+import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 
-type StateProps = StateT & {
-  id: string;
-  onGrab: (id: string, e: MouseEvent) => void;
-  vp: ViewportState;
-  machine: MachineState;
-};
+type StateNode = Node<
+  {
+    radius: number;
+    label: string;
+  },
+  "state"
+>;
 
-const State: React.FC<StateProps> = ({
-  id,
-  label,
-  latex,
-  radius,
-  position,
-  onGrab,
-  vp,
-  machine: _machine
-}) => {
-  const [hover, setHover] = useState(false);
-  const diameter = useMemo(() => radius * 2, [radius]);
-
-  let onMouseDown = (e: MouseEvent) => {
-    // If shift is held, start creating an edge from this node
-    if (e.shiftKey && vp.creatingEdgeFrom === null) {
-      vp.startCreatingEdge(id);
-      return;
-    }
-
-    if (e.target == e.currentTarget && onGrab) {
-      onGrab(id, e);
-    }
-  };
-
-  // ( ͡° ͜ʖ ͡°)
-  const isSelectedForEdging = useMemo(
-    () => hover && vp.creatingEdgeFrom !== null && vp.creatingEdgeFrom !== id,
-    [hover, vp.creatingEdgeFrom, id]
-  );
+const State: React.FC<NodeProps<StateNode>> = ({ data: { label, radius } }) => {
+  const diameter = useMemo(() => 2 * radius, [radius]);
 
   return (
     <div
       style={{
         width: diameter,
-        height: diameter,
-        top: position.y,
-        left: position.x
+        height: diameter
       }}
       className={cn(
-        "absolute",
         "inline-flex items-center justify-center",
+        "bg-(--slate-1) text-(--slate-12)",
+        "border-2 border-(--slate-12)",
         "rounded-full",
-        "text-xl text-(--slate-12)",
-        "bg-(--slate-1)",
-        "border-3 border-(--slate-12)",
-        "active:cursor-grabbing",
         "transition-colors",
-        {
-          "bg-green-500 border-green-700": isSelectedForEdging
-        }
+        "relative"
       )}
-      onMouseDown={onMouseDown}
-      onMouseEnter={() => {
-        setHover(true);
-        vp.setHoveredNode(id);
-      }}
-      onMouseLeave={e => {
-        setHover(false);
-        vp.setHoveredNode(null);
-        stateMouseLeave(vp, id)(e);
-      }}
     >
-      <span className={cn("text-center select-none pointer-events-none")}>
-        {latex ? <LatexRenderer latex={label} /> : label}
-      </span>
+      <Latex latex={label} />
+      <Handle
+        type="source"
+        position={Position.Top}
+        id="default"
+        style={{
+          opacity: 0,
+          pointerEvents: "none"
+        }}
+      />
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        id="default"
+        style={{
+          opacity: 0,
+          pointerEvents: "none"
+        }}
+      />
     </div>
   );
 };
 
 export { State };
+export type { StateNode };
