@@ -1,18 +1,14 @@
-import { cn } from "~/lib/utils";
-import { Latex } from "~/components/latex";
 import React, { useMemo } from "react";
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
+import { Latex } from "~/components/latex";
+import { cn } from "~/lib/utils";
 
-type StateNode = Node<
-  {
-    radius: number;
-    label: string;
-  },
-  "state"
->;
+type StateProps = {
+  radius: number;
+  label: string;
+};
 
-const State: React.FC<NodeProps<StateNode>> = ({ data: { label, radius } }) => {
-  const diameter = useMemo(() => 2 * radius, [radius]);
+const State: React.FC<StateProps> = ({ label, radius }) => {
+  const diameter = useMemo(() => radius * 2, [radius]);
 
   return (
     <div
@@ -22,35 +18,17 @@ const State: React.FC<NodeProps<StateNode>> = ({ data: { label, radius } }) => {
       }}
       className={cn(
         "inline-flex items-center justify-center",
+        "rounded-full",
         "bg-(--slate-1) text-(--slate-12)",
         "border-2 border-(--slate-12)",
-        "rounded-full",
-        "transition-colors",
-        "relative"
+        "select-none cursor-default",
+        "smooth-colors"
       )}
     >
       <Latex latex={label} />
-      <Handle
-        type="source"
-        position={Position.Top}
-        id="default"
-        style={{
-          opacity: 0,
-          pointerEvents: "none"
-        }}
-      />
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        id="default"
-        style={{
-          opacity: 0,
-          pointerEvents: "none"
-        }}
-      />
     </div>
   );
 };
 
 export { State };
-export type { StateNode };
+export type { StateProps };

@@ -24,26 +24,8 @@ body {
   font-style: normal;
 }
 
-/* Edge handle visibility on hover */
-.react-flow__edge:hover .edge-handle {
-  opacity: 1 !important;
-}
-
-.edge-handle:hover {
-  opacity: 1 !important;
-}
-
-.edge-handle.active {
-  opacity: 1 !important;
-}
-
-/* Arrow marker styling */
-.react-flow__edge path {
-  stroke: var(--slate-12);
-  stroke-width: 2.5;
-}
-
-.react-flow__arrowhead {
-  fill: var(--slate-12);
-  opacity: 1;
+.smooth-colors {
+  transition:
+    background-color 100ms ease,
+    color 100ms ease;
 }
